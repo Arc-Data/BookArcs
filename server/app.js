@@ -1,40 +1,24 @@
 import express from 'express';
-import dotenv from 'dotenv'
-import { MongoClient } from 'mongodb';
-
-dotenv.config() 	
+import mongoose from 'mongoose'
+import morgan from 'morgan'
+import { connectToDatabase } from './database.js';
 
 const app = express()
 const port = 3000 
 
-// obtain credentials from dotenv
-const user = process.env.DB_USER;
-const pass = process.env.DB_PASS;
+app.use(morgan('dev'))
 
-// uri string, already contains the name of the database in the link
-const mongoDB = `mongodb+srv://${user}:${pass}@cluster0.u1nbs4l.mongodb.net/bookarcs?retryWrites=true&w=majority`;
-
-// returns a client where we can perform connection 
-const client = new MongoClient(mongoDB)
-
-const main = async () => {
-	try {
-		await client.connect()
-	} catch(error) {
-		console.error(`Error connecting to the database: ${error}`)
-	} finally {
-		await client.close()
-	}
-}
-
-main()
+connectToDatabase().catch(error => {
+	console.error(`Failed to connect to the database: ${error}`)
+	process.exit(1)
+})
 
 app.use((req, res, next) => {
 	console.log(`${req.method} ${req.url}`)
 	next()
 })
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
 	res.json({
 		"test": "Hello"
 	})
