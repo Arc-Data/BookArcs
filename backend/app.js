@@ -1,12 +1,18 @@
 import express from 'express';
-import mongoose from 'mongoose'
 import morgan from 'morgan'
 import { connectToDatabase } from './database.js';
+import userRoutes from './routes/userRoutes.js'
 
 const app = express()
 const port = 3000 
 
 app.use(morgan('dev'))
+
+// Middleware to parse incoming JSON requests
+app.use(express.json());
+// Middleware to parse URL-encoded data (from forms)
+app.use(express.urlencoded({ extended: true }));
+
 
 connectToDatabase().catch(error => {
 	console.error(`Failed to connect to the database: ${error}`)
@@ -17,6 +23,8 @@ app.use((req, res, next) => {
 	console.log(`${req.method} ${req.url}`)
 	next()
 })
+
+app.use('/user', userRoutes)
 
 app.get('/', async (req, res) => {
 	res.json({
