@@ -10,10 +10,26 @@ dotenv.config()
 const AuthController = (() => {
     const generateRefreshToken = async (userId) => {
         const token = crypto.randomBytes(64).toString('hex')
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    
-        await RefreshToken.create({ token, userId, expiresAt })
+        
+        await RefreshToken.create({ 
+            token, 
+            userId, 
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        })
+        
         return token
+    }
+
+    const generateAccessToken = (user) => {
+        return jwt.sign(
+            {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+            }, 
+            process.env.JWT_SECRET_TOKEN,
+            { expiresIn: '15m'}
+        )
     }
     
     const createUser = asyncHandler(async (req, res) => {
@@ -70,16 +86,7 @@ const AuthController = (() => {
             return res.status(401).json({ message: "Invalid credentials"})
         }
 
-        const accessToken = jwt.sign(
-            {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-            }, 
-            process.env.JWT_SECRET_TOKEN,
-            { expiresIn: '15m'}
-        )
-
+        const accessToken = generateAccessToken(user)
         const refreshToken = await generateRefreshToken(user._id)
 
         return res.status(200).json({
@@ -90,9 +97,48 @@ const AuthController = (() => {
 
     }) 
 
+    const refreshToken = asyncHandler(async (req, res) => {
+        const { refreshToken: refresh } = req.body
+    
+        if (!refresh) {
+            return res.status(400).json({ message: "Refresh token is required" })
+        }
+
+        
+        const token = await RefreshToken.findOne({ token: refresh })
+        if (!token) {
+            return res.status(400).json({ message: "Invalid refresh token" })
+        }
+
+        if (token.isExpired) {
+            return res.status(400).json({ message: "Refresh token already expired"})
+        }
+
+        const user = await User.findById(token.userId)
+        if (!user) {
+            return res.status(403).json({ message: "User not found"})
+        }
+
+        // delete all refresh tokens beforehand
+        await RefreshToken.deleteMany({ userId: user._id });
+
+        const accessToken = generateAccessToken(user)
+        const refreshToken = await generateRefreshToken(user._id)
+
+        // Invalidate old refresh tokens
+
+        return res.status(200).json({
+            message: "Token refreshed",
+            accessToken,
+            refreshToken,
+        })
+
+    })
+
     return {
         createUser,
-        loginUser
+        loginUser,
+        refreshToken,
     }
 })()
 

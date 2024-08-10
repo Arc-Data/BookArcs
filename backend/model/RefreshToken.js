@@ -21,6 +21,10 @@ const RefreshTokenSchema = new Schema({
     }
 })
 
+RefreshTokenSchema.virtual('isExpired').get(function() {
+    return this.expiresAt < Date.now()
+})
+
 RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export default mongoose.model("RefreshToken", RefreshTokenSchema)
