@@ -1,7 +1,8 @@
 import express from 'express';
 import morgan from 'morgan'
 import { connectToDatabase } from './database.js';
-import userRoutes from './routes/userRoutes.js'
+// import userRoutes from './routes/userRoutes.js'
+import authRoutes from './routes/authRoutes.js'
 
 const app = express()
 const port = 3000 
@@ -24,7 +25,7 @@ app.use((req, res, next) => {
 	next()
 })
 
-app.use('/user', userRoutes)
+app.use('/api/auth', authRoutes)
 
 app.get('/', async (req, res) => {
 	res.json({
