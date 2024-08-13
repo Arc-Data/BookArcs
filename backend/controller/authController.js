@@ -8,9 +8,7 @@ import crypto from "crypto"
 dotenv.config()
 
 const AuthController = (() => {
-    // the current problem this model does not take into account of is the possibility of one account logging in from multiple devices.
-    // when one token gets refreshed all the others get removed in the process.
-    // therefore future updates should adress that part.
+
     const generateRefreshToken = async (userId) => {
         const token = crypto.randomBytes(64).toString('hex')
         
@@ -122,13 +120,11 @@ const AuthController = (() => {
             return res.status(403).json({ message: "User not found"})
         }
 
-        // delete all refresh tokens beforehand
-        await RefreshToken.deleteMany({ userId: user._id })
+        // remove the current refresh token
+        await RefreshToken.deleteOne({ token: refresh })
 
         const accessToken = generateAccessToken(user)
         const refreshToken = await generateRefreshToken(user._id)
-
-        // Invalidate old refresh tokens
 
         return res.status(200).json({
             message: "Token refreshed",
@@ -145,7 +141,6 @@ const AuthController = (() => {
             return res.status(400).json({ message: "Refresh token is required" })
         }
         
-        // but wouldn't this method kind of raise the problem of multiple devices having their refresh tokens invalidated
         const result = await RefreshToken.deleteOne({ token: refresh })
         if (result.deletedCount === 0) {
             return res.status(404).json({ message: "Refresh token not found" })
