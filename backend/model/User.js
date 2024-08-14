@@ -36,7 +36,7 @@ UserSchema.pre('save', async function (next) {
     } 
     catch (error) {
         console.log(`Error occured while saving user`)
-        next(err)
+        next(error)
     }
 })
 
