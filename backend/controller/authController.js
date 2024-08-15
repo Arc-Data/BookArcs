@@ -77,7 +77,7 @@ const AuthController = (() => {
             return res.status(400).json({ message: "All fields are required"})
         }
         
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email }).select('+password')
         if (!user) {
             return res.status(401).json({ message: "Invalid credentials"})
         }
@@ -93,7 +93,7 @@ const AuthController = (() => {
         return res.status(200).json({
             accessToken,
             refreshToken,
-            message: "Login Successful"
+            message: "Login Successful",
         })
 
     }) 
