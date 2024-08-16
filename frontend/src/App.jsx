@@ -1,7 +1,19 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import Landing from "./pages/Landing"
+import DefaultLayout from "./layout/DefaultLayout"
+
 function App() {
-  return (
-    <h1 className="text-base">This should be something</h1>
-  )
+	return (
+		<BrowserRouter>
+			<Routes>
+				<Route element={<DefaultLayout/>}>
+					<Route path="/" element={<Landing/>}></Route>
+				</Route>
+				{/* 404 path */}
+				{/* <Route path="*" element={<Landing/>}></Route> */}
+			</Routes>
+		</BrowserRouter>
+	)
 }
 
 export default App
