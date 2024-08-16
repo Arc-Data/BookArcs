@@ -1,4 +1,5 @@
 import { IoLibraryOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 // TODO:
 // 1: Live search on the actual home page when book collection is running
@@ -44,7 +45,9 @@ const Landing = () => {
 							The Book Platform everyone needs
 						</h1>				
 						<p className="max-w-[400px] md:max-w-[700px] mx-auto mt-4 text-lg ">Track book releases, progress, and buy light novels all in one platform!</p>
-						<button className="bg-accent-default px-8 py-2.5 rounded-full shadow text-text-800 mt-8 md:mt-20">Create an account</button>
+						<Link to="/signup">
+							<button className="bg-accent-default px-8 py-2.5 rounded-full shadow text-text-800 mt-8 md:mt-20">Create an account</button>
+						</Link>
 					</div>
 				</div>
 			</div>
