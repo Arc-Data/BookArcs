@@ -66,6 +66,7 @@ const SignUp = () => {
                         name="username" 
                         id="username" 
                         className="bg-gray-50 border border-gray-300 text-text-default text-sm rounded-lg block w-full p-2.5" 
+                        required
                     />
                     {errors.username && <p className="mt-1 text-xs text-red-500">{errors.username}</p>}
                 </div>
@@ -77,6 +78,7 @@ const SignUp = () => {
                         name="email" 
                         id="email" 
                         className="bg-gray-50 border border-gray-300 text-text-default text-sm rounded-lg block w-full p-2.5" 
+                        required
                     />
                     {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                 </div>
@@ -88,6 +90,7 @@ const SignUp = () => {
                         name="password" 
                         id="password" 
                         className="bg-gray-50 border border-gray-300 text-text-default text-sm rounded-lg block w-full p-2.5" 
+                        required
                     />
                     {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
                 </div>
@@ -98,7 +101,8 @@ const SignUp = () => {
                         onChange={handleChangeInput} 
                         name="confirm_password" 
                         id="confirm_password" 
-                        className="bg-gray-50 border border-gray-300 text-sm text-text-default rounded-lg block w-full p-2.5" 
+                        className="bg-gray-50 border border-gray-300 text-sm text-text-default rounded-lg block w-full p-2.5"
+                        required 
                     />
                     {errors.confirm_password && <p className="mt-1 text-xs text-red-500">{errors.confirm_password}</p>}
                 </div>
