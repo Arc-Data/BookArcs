@@ -8,19 +8,24 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         unique: true,
+        trim: true,
     },
     'email': {
         type: String,
         required: true,
+        trim: true,
         unique: true,
     },
     'password': {
         type: String,
+        trim: true,
         required: true,
         select: false
     },
     'slug': {
+        trim: true,
         type: String,
+        sparse: true,
         unique: true,
     }
 })
@@ -35,13 +40,12 @@ UserSchema.pre('save', async function (next) {
         next()
     } 
     catch (error) {
-        console.log(`Error occured while saving user`)
         next(error)
     }
 })
 
 UserSchema.pre('save', async function (next) {
-    if (!this.isModified('username')) {
+    if (this.isModified('username')) {
         this.slug = slugify(this.username, { lower: true})
     }
 
@@ -49,8 +53,6 @@ UserSchema.pre('save', async function (next) {
 })
 
 UserSchema.methods.comparePassword = async function (candidatePassword) {
-    console.log("This works")
-    console.log(this.password)
     return await bcrypt.compare(candidatePassword, this.password)
 }
 

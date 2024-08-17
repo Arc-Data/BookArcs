@@ -1,5 +1,6 @@
 import express from 'express';
 import morgan from 'morgan'
+import cors from "cors"
 import { connectToDatabase } from './database.js';
 import authRoutes from './routes/authRoutes.js'
 import userRoutes from './routes/userRoutes.js'
@@ -11,6 +12,10 @@ import passport from './config/passport.js'
 const app = express()
 const port = 3000 
 
+app.use(cors({
+	origin: 'http://localhost:5173',
+	credentials: true
+}))	
 app.use(morgan('dev'))
 
 // Middleware to parse incoming JSON requests

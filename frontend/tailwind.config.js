@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+// https://www.realtimecolors.com/?colors=101212-f4f9f8-4dbdae-8de8db-54f2dc&fonts=Montserrat-Roboto
 export default {
   darkMode: 'class',
   content: [
