@@ -24,9 +24,11 @@ const AuthController = (() => {
     const generateAccessToken = (user) => {
         return jwt.sign(
             {
-                id: user._id,
-                username: user.username,
-                email: user.email,
+                user: {
+                    id: user._id,
+                    username: user.username,
+                    email: user.email,
+                }
             }, 
             process.env.JWT_SECRET_TOKEN,
             { expiresIn: '15m'}
@@ -107,7 +109,6 @@ const AuthController = (() => {
         return res.status(200).json({
             accessToken,
             refreshToken,
-            message: "Login Successful",
         })
 
     }) 

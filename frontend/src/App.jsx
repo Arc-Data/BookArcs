@@ -4,20 +4,34 @@ import DefaultLayout from "./layout/DefaultLayout"
 import Login from "./pages/Login"
 import SignUp from "./pages/SignUp"
 import ScrollToTop from "./components/ScrollToTop"
+import { AuthProvider } from "./context/AuthContext"
+import BaseRoutes from "./routes/BaseRoutes"
+import UserRoutes from "./routes/UserRoutes"
 
 function App() {
 	return (
 		<BrowserRouter>
 			<ScrollToTop/>
-			<Routes>
-				<Route element={<DefaultLayout/>}>
-					<Route path="/" element={<Landing/>} />
-					<Route path="/login" element={<Login/>}/>
-					<Route path="/signup" element={<SignUp/>}/>
-				</Route>
-				{/* 404 path */}
-				{/* <Route path="*" element={<Landing/>}></Route> */}
-			</Routes>
+			<AuthProvider>
+				<Routes>
+					{/* Default Routes */}
+					<Route element={<BaseRoutes/>}>
+						<Route element={<DefaultLayout />}>
+							<Route path="/" element={<Landing/>} />
+							<Route path="/login" element={<Login/>}/>
+							<Route path="/signup" element={<SignUp/>}/>
+						</Route>
+					</Route>
+ 					{/*  User authenticated routes */}
+					<Route element={<UserRoutes />}>
+						<Route element={<DefaultLayout />}>
+							<Route path="/home" />
+						</Route>
+					</Route>
+					{/* 404 path */}
+					{/* <Route path="*" element={<Landing/>}></Route> */}
+				</Routes>
+			</AuthProvider>
 		</BrowserRouter>
 	)
 }
