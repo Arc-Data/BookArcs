@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler"
 import User from '../model/User.js'
+import Admin from '../model/Admin.js'
 import RefreshToken from "../model/RefreshToken.js"
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
@@ -9,13 +10,12 @@ dotenv.config()
 
 const AuthController = (() => {
 
-    const generateRefreshToken = async (userId, userType) => {
+    const generateRefreshToken = async (userId) => {
         const token = crypto.randomBytes(64).toString('hex')
         
         await RefreshToken.create({ 
             token, 
             userId, 
-            userType,
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         })
         
@@ -70,9 +70,9 @@ const AuthController = (() => {
             })
         }
         
-        const user = await User.create({ username, email, password })
+        const user = await Admin.create({ username, email, password })
         const accessToken = generateAccessToken(user)
-        const refreshToken = await generateRefreshToken(user._id, "User")
+        const refreshToken = await generateRefreshToken(user._id)
 
         res.status(201).json({
             accessToken,
@@ -90,7 +90,7 @@ const AuthController = (() => {
             return res.status(400).json({ message: "All fields are required"})
         }
         
-        const user = await User.findOne({ email }).select('+password')
+        const user = await Admin.findOne({ email }).select('+password')
         if (!user) {
             return res.status(401).json({ message: "Invalid credentials"})
         }
@@ -101,7 +101,7 @@ const AuthController = (() => {
         }
 
         const accessToken = generateAccessToken(user)
-        const refreshToken = await generateRefreshToken(user._id, "User")
+        const refreshToken = await generateRefreshToken(user._id)
 
         return res.status(200).json({
             accessToken,
@@ -136,7 +136,7 @@ const AuthController = (() => {
         await RefreshToken.deleteOne({ token: refresh })
 
         const accessToken = generateAccessToken(user)
-        const refreshToken = await generateRefreshToken(user._id, "User")
+        const refreshToken = await generateRefreshToken(user._id)
 
         return res.status(200).json({
             message: "Token refreshed",
