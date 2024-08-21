@@ -1,8 +1,10 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { Link } from "react-router-dom"
 import axios from "../utils/axios"
+import AuthContext from "../context/AuthContext"
 
 const SignUp = () => {
+    const { registerUser } = useContext(AuthContext)
     const [ errors, setErrors ] = useState({})
     const [ loading, setLoading ] = useState(false)
     const [ data, setData ] = useState({
@@ -25,6 +27,8 @@ const SignUp = () => {
         }))
     }
 
+
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
@@ -36,14 +40,9 @@ const SignUp = () => {
             }));
             return;
         }
-        
+
         try {
-            const response = await axios.post('api/auth/register', {
-                username: data.username,
-                email: data.email,
-                password: data.password,
-            })
-            console.log(response)
+            await registerUser(data)
         }
         catch (error) {
             setErrors(error.response.data.errors)

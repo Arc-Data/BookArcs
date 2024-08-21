@@ -39,8 +39,6 @@ const AuthController = (() => {
         const { username, email, password } = req.body
         const errors = {}
 
-        console.log("Huh?")
-
         if (!username) {
             errors['username'] = "Username is required"
         }
@@ -72,14 +70,12 @@ const AuthController = (() => {
         }
         
         const user = await User.create({ username, email, password })
-        
+        const accessToken = generateAccessToken(user)
+        const refreshToken = await generateRefreshToken(user._id)
+
         res.status(201).json({
-            message: "User created successfully",
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email
-            }
+            accessToken,
+            refreshToken,
         })
     })
     
@@ -150,6 +146,8 @@ const AuthController = (() => {
     })
 
     const logoutUser = asyncHandler(async (req, res) => {
+        // for the time being, logging out the user does not involve sending over the 
+        // access tokens. Dunno if best practice or so.
         const { refreshToken: refresh } = req.body
 
         if (!refresh) {

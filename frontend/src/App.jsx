@@ -7,6 +7,7 @@ import ScrollToTop from "./components/ScrollToTop"
 import { AuthProvider } from "./context/AuthContext"
 import BaseRoutes from "./routes/BaseRoutes"
 import UserRoutes from "./routes/UserRoutes"
+import UserLayout from "./layout/UserLayout"
 
 function App() {
 	return (
@@ -24,7 +25,7 @@ function App() {
 					</Route>
  					{/*  User authenticated routes */}
 					<Route element={<UserRoutes />}>
-						<Route element={<DefaultLayout />}>
+						<Route element={<UserLayout />}>
 							<Route path="/home" />
 						</Route>
 					</Route>

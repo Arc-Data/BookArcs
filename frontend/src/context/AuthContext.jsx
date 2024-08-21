@@ -32,19 +32,42 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
-    const registerUser = (data) => {
+    const registerUser = async (data) => {
         try {
+            const response = await axios.post('api/auth/register', {
+                username: data.username,
+                email: data.email,
+                password: data.password,
+            })
 
+            setAuthTokens(response.data)
+            
+            const user = jwtDecode(response.data.accessToken)
+            setUser(user)
+
+            localStorage.setItem('authTokens', JSON.stringify(response.data)) 
+
+            navigate('/home')
         }
         catch (error) {
             throw error
         }
     }
 
-    const logoutUser = () => {
-        setAuthTokens(null)
-        setUser(null)
-        localStorage.removeItem('authTokens')
+    const logoutUser = async () => {
+        try {
+            await axios.post('api/auth/logout', {
+                refreshToken: authTokens.refreshToken
+            })
+        }
+        catch (error) {
+            console.log(`An error has occured during logout: ${error}`)
+        }
+        finally {
+            setAuthTokens(null)
+            setUser(null)
+            localStorage.removeItem('authTokens')
+        }
     }
 
     const updateToken = async () => {
@@ -69,6 +92,7 @@ export const AuthProvider = ({ children }) => {
     const contextData = {
         loginUser,
         registerUser,
+        logoutUser,
         loading,
         user,
         authTokens
