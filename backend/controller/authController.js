@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler"
 import User from '../model/User.js'
+import Admin from '../model/Admin.js'
 import RefreshToken from "../model/RefreshToken.js"
 import jwt from "jsonwebtoken"
 import dotenv from "dotenv"
@@ -22,20 +23,23 @@ const AuthController = (() => {
         return token
     }
 
-    const generateAccessToken = (user) => {
+    const generateAccessToken = (user, role) => {
         return jwt.sign(
             {
                 user: {
                     id: user._id,
                     username: user.username,
                     email: user.email,
+                    role
                 }
             }, 
             process.env.JWT_SECRET_TOKEN,
             { expiresIn: '15m'}
         )
     }
-    
+
+    // TODO: Create a feature inside the admin page to create more admins
+    // only then will this function be adjusted to create more admins
     const createUser = asyncHandler(async (req, res) => {
         const { username, email, password } = req.body
         const errors = {}
@@ -71,7 +75,7 @@ const AuthController = (() => {
         }
         
         const user = await User.create({ username, email, password })
-        const accessToken = generateAccessToken(user)
+        const accessToken = generateAccessToken(user, "User")
         const refreshToken = await generateRefreshToken(user._id, "User")
 
         res.status(201).json({
@@ -81,7 +85,7 @@ const AuthController = (() => {
     })
     
     const loginUser = asyncHandler(async (req, res) => {
-        const { email, password } = req.body
+        const { email, password, type } = req.body
         
         // we are gonna return immediately even if this ends the response request cycle 
         // because we will have to assign tokens later and thats not possible without a successful User
@@ -89,8 +93,11 @@ const AuthController = (() => {
         if (!email || !password ) {
             return res.status(400).json({ message: "All fields are required"})
         }
+
+        const user = type === "User" ? 
+            await User.findOne({ email }).select('+password') :
+            await Admin.findOne({email}).select('+password')
         
-        const user = await User.findOne({ email }).select('+password')
         if (!user) {
             return res.status(401).json({ message: "Invalid credentials"})
         }
@@ -100,8 +107,8 @@ const AuthController = (() => {
             return res.status(401).json({ message: "Invalid credentials"})
         }
 
-        const accessToken = generateAccessToken(user)
-        const refreshToken = await generateRefreshToken(user._id, "User")
+        const accessToken = generateAccessToken(user, type ?? "Admin")
+        const refreshToken = await generateRefreshToken(user._id, type === "user" ? "User" : "Admin")
 
         return res.status(200).json({
             accessToken,
@@ -117,9 +124,8 @@ const AuthController = (() => {
             return res.status(400).json({ message: "Refresh token is required" })
         }
 
-        
-        const token = await RefreshToken.findOne({ token: refresh })
-        if (!token) {
+        const token = await RefreshToken.findOne({ token: refresh }).populate('userId')
+        if (!token ) {
             return res.status(400).json({ message: "Invalid refresh token" })
         }
 
@@ -127,16 +133,11 @@ const AuthController = (() => {
             return res.status(400).json({ message: "Refresh token already expired"})
         }
 
-        const user = await User.findById(token.userId)
-        if (!user) {
-            return res.status(403).json({ message: "User not found"})
-        }
-
         // remove the current refresh token
         await RefreshToken.deleteOne({ token: refresh })
 
-        const accessToken = generateAccessToken(user)
-        const refreshToken = await generateRefreshToken(user._id, "User")
+        const accessToken = generateAccessToken(token.userId, token.userType)
+        const refreshToken = await generateRefreshToken(token.userId._id, token.userType)
 
         return res.status(200).json({
             message: "Token refreshed",

@@ -8,6 +8,8 @@ import { AuthProvider } from "./context/AuthContext"
 import BaseRoutes from "./routes/BaseRoutes"
 import UserRoutes from "./routes/UserRoutes"
 import UserLayout from "./layout/UserLayout"
+import AdminLogin from "./pages/AdminLogin"
+import Home from "./pages/Home"
 
 function App() {
 	return (
@@ -22,13 +24,15 @@ function App() {
 							<Route path="/login" element={<Login/>}/>
 							<Route path="/signup" element={<SignUp/>}/>
 						</Route>
+						<Route path="/login/admin" element={<AdminLogin/>}/>
 					</Route>
  					{/*  User authenticated routes */}
 					<Route element={<UserRoutes />}>
 						<Route element={<UserLayout />}>
-							<Route path="/home" />
+							<Route path="/home" element={<Home/>}/>
 						</Route>
 					</Route>
+					{/* Admin authenticated routes */}
 					{/* 404 path */}
 					{/* <Route path="*" element={<Landing/>}></Route> */}
 				</Routes>

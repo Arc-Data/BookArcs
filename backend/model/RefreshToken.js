@@ -9,6 +9,7 @@ const RefreshTokenSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
         required: true,
+        refPath: 'userType'
     },
     userType: {
         type: String,
@@ -27,13 +28,6 @@ const RefreshTokenSchema = new Schema({
 
 RefreshTokenSchema.virtual('isExpired').get(function() {
     return this.expiresAt < Date.now()
-})
-
-RefreshTokenSchema.virtual('user', {
-    ref: doc => doc.userType,
-    localField: 'userId',
-    foreignField: '_id',
-    justOne: true
 })
 
 RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });

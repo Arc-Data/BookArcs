@@ -15,9 +15,14 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate()
 
     // this version does not currently support role based authenticating
-    const loginUser = async (data) => {
+    const loginUser = async (data, userType) => {
         try {
-            const response = await axios.post('api/auth/login', data)
+            console.log(userType)
+            const response = await axios.post('api/auth/login', {
+                email: data.email,
+                password: data.password,
+                type: userType
+            })
             setAuthTokens(response.data)
             
             const user = jwtDecode(response.data.accessToken)
