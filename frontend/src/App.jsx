@@ -10,6 +10,7 @@ import UserRoutes from "./routes/UserRoutes"
 import UserLayout from "./layout/UserLayout"
 import AdminLogin from "./pages/AdminLogin"
 import Home from "./pages/Home"
+import AdminLayout from "./layout/AdminLayout"
 
 function App() {
 	return (
@@ -28,7 +29,7 @@ function App() {
 					</Route>
  					{/*  User authenticated routes */}
 					<Route element={<UserRoutes />}>
-						<Route element={<UserLayout />}>
+						<Route element={<AdminLayout />}>
 							<Route path="/home" element={<Home/>}/>
 						</Route>
 					</Route>

@@ -137,3 +137,7 @@
     --accent-950: #e7fdfa;
   }
 }
+
+.admin-sidebar {
+  height: calc(100vh - (1.25rem + 1.777rem));
+}
